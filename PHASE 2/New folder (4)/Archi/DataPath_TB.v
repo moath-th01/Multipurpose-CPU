@@ -1,0 +1,1241 @@
+module datApath_tb();
+    parameter wsize = 16;
+    parameter addr = 12;
+    reg [wsize-1:0] data_in;
+    wire [wsize-1:0] data_out;
+    reg CLK;
+    reg [2:0] s;
+    reg ldAR, ldPC, ldDR, ldAC, ldIR, ldTR;
+    reg clrAR, clrPC, clrDR, clrAC, clrTR;
+    reg inrAR, inrPC, inrDR, inrAC, inrTR;
+    reg memwrite, memread;
+    reg [3:0] aluop;
+    reg I;
+    
+    datapath #(.wsize(wsize), .addr(addr)) path (
+        .s(s),
+        .data_in(data_in),
+        .data_out(data_out),
+        .ldAR(ldAR), 
+        .ldPC(ldPC),
+        .ldDR(ldDR), 
+        .ldAC(ldAC),
+        .ldIR(ldIR), 
+        .ldTR(ldTR),
+        .clrAR(clrAR), 
+        .clrPC(clrPC),
+        .clrDR(clrDR), 
+        .clrAC(clrAC), 
+        .clrTR(clrTR),
+        .inrAR(inrAR), 
+        .inrPC(inrPC),
+        .inrDR(inrDR), 
+        .inrAC(inrAC), 
+        .inrTR(inrTR),
+        .memwrite(memwrite),
+        .memread(memread),
+        .CLK(CLK),
+        .aluop(aluop),
+        .I(I)
+    );
+
+    // Initialize clock
+    initial begin
+        CLK = 0;
+        forever #5 CLK = ~CLK;  
+    end
+  
+ initial begin
+
+    path.PC1.Data_out=16'h012c;
+    path.AR1.Data_out=12'h000;
+    path.AC1.Data_out=16'h0000;
+    path.DR1.Data_out=16'h0000;
+    path.IR1.Data_out=16'h0000;
+    path.TR1.Data_out=16'h0000;
+    ldAR=0;ldPC=0;ldDR=0;ldAC=0;ldIR=0;ldTR=0;
+    clrAR=0;clrPC=0;clrDR=0;clrAC=0;clrTR=0;
+    inrAR=0;inrPC=0;inrDR=0;inrAC=0;inrTR=0;
+    memwrite=0;memread=0;
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\n----------------------------Direct Memory Operations----------------------------");
+    $display("\nADD INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Direct : Nothing) I = %b",I);
+    $display("Executing ADD instruction...");
+    #10;
+    s = 3'b001;
+    memread = 1;
+    #10;
+    memread = 0;
+    s = 3'b111;
+    ldDR = 1;
+    #10;
+    ldDR = 0;
+    $display(" T4D1: (DR <- M[AR]) DR = %h", path.DR1.Data_out);
+    #10;
+    s = 3'b011;
+    aluop =4'b0001;
+    ldAC = 1;
+    #10;
+    ldAC = 0;
+    $display(" T5D1: (AC <- AC + DR, E <- Cout) AC = %h, E = %b", path.AC1.Data_out,path.E1.newE);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\nAND INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Direct : Nothing) I = %b",I);
+    $display("Executing AND instruction...");
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldDR = 1;
+    #10;
+    ldDR = 0;
+    $display(" T4D0: (DR <- M[AR]) DR = %h", path.DR1.Data_out);
+    #10;
+    s = 3'b011;
+    aluop =4'b0000;
+    ldAC = 1;
+    #10;
+    ldAC = 0;
+    $display(" T5D0: (AC <- AC & DR) AC = %h", path.AC1.Data_out);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\nLDA INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1;
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Direct : Nothing) I = %b",I);
+    $display("Executing LDA instruction...");
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldDR = 1;
+    #10;
+    ldDR = 0;
+    $display(" T4D2: (DR <- M[AR]) DR = %h", path.DR1.Data_out);
+    clrAC =1;
+    #10;
+    clrAC = 0;
+    s = 3'b011;
+    aluop = 4'b0001;
+    ldAC = 1;
+    #10;
+    ldAC = 0;
+    $display(" T5D2: (AC <- DR) AC = %h", path.AC1.Data_out);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\nSTA INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Direct : Nothing) I = %b",I);
+    #10;$display("Executing STA instruction...");
+    s = 3'b100;
+    memwrite = 1;
+    #10;
+    memwrite =0;
+    $display(" T4D3: (M[AR] <- AC) M[AR] = %h", path.memo1.data_in);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\nBUN INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1;  
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Direct : Nothing) I = %b",I);
+    #10;$display("Executing BUN instruction...");
+    s = 3'b001;
+    ldPC = 1;
+    #10;
+    ldPC = 0;
+    $display(" T4D4: (PC <- AR) PC = %h", path.PC1.Data_out);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    path.PC1.Data_out=16'h0131;
+    $display("\nBSA INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1;
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Direct : Nothing) I = %b",I);
+    #10;$display("Executing BSA instruction...");
+    s = 3'b010;
+    memwrite = 1;
+    #10;
+    memwrite = 0;
+    inrAR = 1;
+    #10;
+    inrAR = 0;
+    #10;$display(" T4D5: (M[AR] <- PC, AR <- AR + 1) M[444] = %h, AR = %h", path.memo1.data_in, path.AR1.Data_out);
+    s = 3'b001;
+    ldPC = 1;
+    #10;
+    ldPC = 0;
+    $display(" T5D5: (PC <- AR) PC = %h", path.PC1.Data_out);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    path.PC1.Data_out=16'h0132;         
+    $display("\nISZ INSTRUCTION");
+    #10;$display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1;
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Direct : Nothing) I = %b",I);
+    #10;$display("Executing ISZ instruction...");
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldDR = 1;
+    #10;
+    ldDR = 0;
+    #10;$display(" T4D6: (DR <- M[AR]) DR = %h", path.DR1.Data_out);
+    inrDR = 1;
+    #10;
+    inrDR = 0;
+    #10;$display(" T5D6: (DR <- DR + 1) DR = %h", path.DR1.Data_out);
+    s = 3'b010;
+    memwrite = 1;
+    #10;
+    memwrite =0; 
+    if (path.DR1.Data_out == 0)
+    begin
+        inrPC = 1;
+        #10;
+        inrPC = 0;
+    end 
+    $display(" T6D6: (M[AR] <- DR, [If (DR == 0) : PC <- PC + 1]) M[AR] = %h, PC = %h", path.memo1.data_in, path.PC1.Data_out);        
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\n----------------------------Indirect Memory Operations----------------------------");         
+    $display("ADD INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    #10;$display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    $display(" T3 (Indirect): AR <- M[AR], AR = %h", path.AR1.Data_out);
+    $display("Executing ADD instruction...");
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldDR = 1;
+    #10;
+    ldDR = 0;
+    $display(" T4D1: (DR <- M[AR]) DR = %h", path.DR1.Data_out);
+    #10;
+    s = 3'b011;
+    aluop =4'b0001;
+    ldAC = 1;
+    #10;
+    ldAC = 0;
+    $display(" T5D1: (AC <- AC + DR, E <- Cout) AC = %h, E = %b", path.AC1.Data_out,path.E1.newE);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\nAND INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    #10;$display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    $display(" T3 (Indirect): AR <- M[AR], AR = %h", path.AR1.Data_out);
+    $display("Executing AND instruction...");
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldDR = 1;
+    #10;
+    ldDR = 0;
+    $display(" T4D0: (DR <- M[AR]) DR = %h", path.DR1.Data_out);
+    #10;
+    s = 3'b011;
+    aluop =4'b0000;
+    ldAC = 1;
+    #10;
+    ldAC = 0;
+    $display(" T5D0: (AC <- AC & DR) AC = %h", path.AC1.Data_out);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\nLDA INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1;
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    #10;$display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    $display(" T3 (Indirect): AR <- M[AR], AR = %h", path.AR1.Data_out);
+    $display("Executing LDA instruction...");
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldDR = 1;
+    #10;
+    ldDR = 0;
+    $display(" T4D2: (DR <- M[AR]) DR = %h", path.DR1.Data_out);
+    clrAC =1;
+    #10;
+    clrAC = 0;
+    s = 3'b011;
+    aluop = 4'b0001;
+    ldAC = 1;
+    #10;
+    ldAC = 0;
+    $display(" T5D2: (AC <- DR) AC = %h", path.AC1.Data_out);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\nSTA INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    #10;$display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    $display(" T3 (Indirect): AR <- M[AR], AR = %h", path.AR1.Data_out);
+    #10;$display("Executing STA instruction...");
+    s = 3'b100;
+    memwrite = 1;
+    #10;
+    memwrite =0;
+    $display(" T4D3: (M[AR] <- AC) M[AR] = %h", path.memo1.data_in);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\nBUN INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1;  
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    #10;$display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    $display("T3 (Indirect): AR <- M[AR], AR = %h", path.AR1.Data_out);
+    #10;$display("Executing BUN instruction...");
+    s = 3'b001;
+    ldPC = 1;
+    #10;
+    ldPC = 0;
+    $display(" T4D4: (PC <- AR) PC = %h", path.PC1.Data_out);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    path.PC1.Data_out = 16'h0138;
+    
+    $display("\nBSA INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1;
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    #10;$display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    $display(" T3 (Indirect): AR <- M[AR], AR = %h", path.AR1.Data_out);
+    #10;$display("Executing BSA instruction...");
+    s = 3'b010;
+    memwrite = 1;
+    #10;
+    memwrite = 0;
+    inrAR = 1;
+    #10;
+    inrAR = 0;
+    #10;$display(" T4D5: (M[AR] <- PC, AR <- AR + 1) M[444] = %h, AR = %h", path.memo1.data_in, path.AR1.Data_out);
+    s = 3'b001;
+    ldPC = 1;
+    #10;
+    ldPC = 0;
+    $display(" T5D5: (PC <- AR) PC = %h", path.PC1.Data_out);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    path.PC1.Data_out=16'h0139;         
+    $display("\nISZ INSTRUCTION");
+    #10;$display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1;
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    #10;$display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    $display(" T3 (Indirect): AR <- M[AR], AR = %h", path.AR1.Data_out);
+    #10;$display("Executing ISZ instruction...");
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldDR = 1;
+    #10;
+    ldDR = 0;
+    #10;$display(" T4D6: (DR <- M[AR]) DR = %h", path.DR1.Data_out);
+    inrDR = 1;
+    #10;
+    inrDR = 0;
+    #10;$display(" T5D6: (DR <- DR + 1) DR = %h", path.DR1.Data_out);
+    s = 3'b010;
+    memwrite = 1;
+    #10;
+    memwrite =0;
+    if (path.DR1.Data_out == 0)
+    begin
+        inrPC = 1;
+        #10;
+        inrPC = 0;
+    end
+    $display(" T6D6: (M[AR] <- DR, [If (DR == 0) : PC <- PC + 1]) M[AR] = %h, PC = %h", path.memo1.data_in, path.PC1.Data_out);        
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+             
+    $display("\n----------------------------Register Reference Operations----------------------------");                  
+    $display("CLA INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Register) I = %b",I);
+    #10;$display("Executing CLA instruction...");
+    clrAC = 1;
+    #10;
+    clrAC = 0;
+    #10;$display(" T4D7B11: (AC <- 0) AC = %h", path.AC1.Data_out);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\nCLE INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Register) I = %b",I);
+    #10;$display("Executing CLE instruction...");
+    aluop = 4'b0111;
+    #10;$display(" T4D7B10: (E <- 0) E = %h", path.E1.newE);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\nCMA INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Register) I = %b",I);
+    #10;$display("Executing CMA instruction...");
+    aluop = 4'b0011;
+    ldAC = 1;
+    #10;
+    ldAC = 0;
+    #10;$display(" T4D7B9: (AC <- ~AC) AC = %h", path.AC1.Data_out);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\nCME INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Register) I = %b",I);
+    #10;$display("Executing CME instruction...");
+    aluop = 4'b1000;
+    #10;$display(" T4D7B8: (E <- ~E) E = %h", path.E1.newE);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\nCIR INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Register) I = %b",I);
+    #10;$display("Executing CIR instruction...");
+    aluop = 4'b0111; // clear the E bit 
+    #10
+    aluop = 0100; // CIR function
+    ldAC = 1;
+    #10;
+    ldAC = 0;
+    
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    $display("\nCIL INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Register) I = %b",I);
+    #10;$display("Executing CIL instruction...");
+    aluop = 0101; // CIL function
+    ldAC = 1;
+    #10;
+    ldAC = 0;
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    ////////////////////////////////////////////////////////////////////////////
+    $display("\nINC INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Register) I = %b",I);
+    #10;$display("Executing INC instruction...");
+    inrAC = 1;
+    #10;
+    inrAC = 0;
+    $display(" T4D7B5: (AC <- AC + 1) AC = %h", path.AC1.Data_out);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    $display("\nSPA INSTRUCTION");                                                                                                
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Register) I = %b",I);
+    #10;$display("Executing SPA instruction...");
+    if (path.AC1.Data_out[15] == 0) 
+    begin
+      
+        inrPC = 1;
+        #10;
+        inrPC = 0;
+    end  
+    $display(" T4D7B4: ([if(AC[15] == 0) : PC <- PC + 1]) PC = %h, AC[15] = %b",path.PC1.Data_out,path.AC1.Data_out[15]);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    path.PC1.Data_out = 16'h0142;
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    $display("\nSNA INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Register) I = %b",I);
+    #10;$display("Executing SNA instruction...");
+    if (path.AC1.Data_out[15] == 1)
+        inrPC = 1;
+        #10;
+        inrPC = 0;
+    $display(" T4D7B3: ([if(AC[15] == 1) : PC <- PC + 1]) PC = %h, AC[15] = %b",path.PC1.Data_out,path.AC1.Data_out[15]);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    path.PC1.Data_out = 16'h0143;
+    $display("\nSZA INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Register) I = %b",I);
+    #10;$display("Executing SZA instruction...");
+    clrAC=1;
+    #10;
+    clrAC=0;
+    if (path.AC1.Data_out == 0)
+    begin
+        inrPC = 1;
+        #10;
+        inrPC = 0;
+    end
+    $display(" T4D7B2: ([if(AC == 0) : PC <- PC + 1]) PC = %h, AC = %h",path.PC1.Data_out,path.AC1.Data_out);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    path.PC1.Data_out = 16'h0144;
+    $display("\nSZE INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Register) I = %b",I);
+    #10;$display("Executing SZE instruction...");
+    aluop = 0111; //clear the E bit 
+    #10;
+    if (path.E1.newE == 0)
+    begin
+        inrPC = 1;
+        #10;
+        inrPC = 0;
+    end    
+    $display(" T4D7B1: ([if(E == 0) : PC <- PC + 1]) PC = %h, E = %b",path.PC1.Data_out,path.E1.newE);
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    
+    
+    
+    path.PC1.Data_out = 16'h0145;
+    $display("\nHLT INSTRUCTION");
+    #10;
+    $display("Fetching instruction...");
+    s = 3'b010;
+    ldAR = 1; 
+    #10
+    ldAR = 0; 
+    $display(" T0: (AR <- PC) AR = %h, PC = %h", path.AR1.Data_out, path.PC1.Data_out);
+    #10;
+    s = 3'b001;
+    memread = 1; 
+    #10
+    memread = 0;
+    s = 3'b111;
+    ldIR = 1;
+    inrPC = 1;
+    #10;
+    ldIR = 0;
+    inrPC = 0;
+    $display(" T1: (IR <- M[AR], PC <- PC + 1) IR = %h, PC = %h", path.IR1.Data_out, path.PC1.Data_out);
+    #10;$display("Decoding instruction...");
+    s = 3'b101;
+    ldAR = 1;
+    #10;
+    ldAR = 0;
+    I = path.IR1.Data_out[15];
+    $display(" T2: (AR <- IR[0-11], I <- IR[15]) AR = %h", path.AR1.Data_out);
+    $display(" T3: (Register) I = %b",I);
+    clrPC=1;
+    clrAC=1;
+    clrAR=1;
+    clrDR=1;
+    clrTR=1;
+    #10
+    clrPC=0;
+    clrAC=0;
+    clrAR=0;
+    clrDR=0;
+    clrTR=0;
+    $display("Time: %0t | AR: %h | PC: %h | DR: %h | AC: %h | IR: %h | I: %b ",
+             $time, path.AR1.Data_out, path.PC1.Data_out, path.DR1.Data_out,
+             path.AC1.Data_out, path.IR1.Data_out, I);
+    #10000 $stop; 
+end
+endmodule

@@ -1,0 +1,273 @@
+m255
+K3
+13
+cModel Technology
+Z0 dC:\Users\ahmad\OneDrive\Desktop
+vAC_Register
+Z1 !s100 o69?7zkhTPGEP9IX_]0gz2
+Z2 IBb;V9ek]_1LTALY4A90mJ2
+Z3 V:_@g6P6XTo=A?W1B8Cc^G1
+Z4 dC:\Users\User\Desktop\New folder (4)\Archi
+Z5 w1733419075
+Z6 8C:/Users/User/Desktop/New folder (4)/Archi/REG.v
+Z7 FC:/Users/User/Desktop/New folder (4)/Archi/REG.v
+L0 65
+Z8 OV;L;6.6c;45
+r1
+31
+Z9 !s102 -nocovercells
+Z10 o-work work -nocovercells -O0
+Z11 n@a@c_@register
+!s85 0
+!s101 -O0
+vALU
+Z12 !s100 @NMEYmV:JQWnf9L7i;>?]1
+Z13 If?0laL1gRXM5R7GL<nMML1
+Z14 Vz2Rk<JIQEo:NVzNEzOiIN1
+R4
+Z15 w1733418883
+Z16 8C:/Users/User/Desktop/New folder (4)/Archi/ALU.v
+Z17 FC:/Users/User/Desktop/New folder (4)/Archi/ALU.v
+L0 1
+R8
+r1
+31
+R9
+R10
+Z18 n@a@l@u
+!s85 0
+!s101 -O0
+vAR_Register
+Z19 !s100 Td]bJ`7eH?:0WdFRPCnWe1
+Z20 IPHk_=c<@?1OkRIfNWe7UI2
+Z21 V^3LdOFignGVZIZ^E=hRn_1
+R4
+R5
+R6
+R7
+L0 1
+R8
+r1
+31
+R9
+R10
+Z22 n@a@r_@register
+!s85 0
+!s101 -O0
+vcommonbus
+Z23 !s100 ^<TkcV79;fhgX5H]BgER;1
+Z24 IGGQW;l[PlHPKBcY[dd<[30
+Z25 V5cJd`S90ORHVA]KN?:>Ql3
+R4
+Z26 w1733493237
+Z27 8C:/Users/User/Desktop/New folder (4)/Archi/DataPath.v
+Z28 FC:/Users/User/Desktop/New folder (4)/Archi/DataPath.v
+L0 1
+R8
+r1
+31
+R9
+R10
+!s85 0
+!s101 -O0
+vdatapath
+Z29 !s100 ES24j>G^3TA1j1d[6RkeX2
+Z30 Id`5bn8gcPKHQgSVicZ]1C0
+Z31 V:jaoUN[C>HCj:`8zOkD<P2
+R4
+R26
+R27
+R28
+L0 35
+R8
+r1
+31
+R9
+R10
+!s85 0
+!s101 -O0
+vdatApath_tb
+!s100 KZc<0:YfU7D2>QJX99<Gb1
+Ie:<JL8K`dBVeJii53VnAX1
+Z32 VhfdY_NDE1aD>Ed?ZM@NGf3
+R4
+w1733493265
+Z33 8C:/Users/User/Desktop/New folder (4)/Archi/DataPath_TB.v
+Z34 FC:/Users/User/Desktop/New folder (4)/Archi/DataPath_TB.v
+L0 1
+R8
+r1
+!s85 0
+31
+!s101 -O0
+R9
+R10
+Z35 ndat@apath_tb
+vdatapath_tb
+Z36 !s100 zCJ_LcD`Qj7o_m8[KPM960
+Z37 IUgFKTo5G8;Sf`]9Je^;jb3
+Z38 VV]Z>8EjogVVZ96o0T_i6b0
+Z39 dC:\Users\ahmad\OneDrive\Desktop\Archi
+Z40 w1733418847
+Z41 8C:/Users/ahmad/OneDrive/Desktop/Archi/DataPath_TB.v
+Z42 FC:/Users/ahmad/OneDrive/Desktop/Archi/DataPath_TB.v
+L0 16
+R8
+r1
+31
+R9
+R10
+!s85 0
+!s101 -O0
+vDR_Register
+Z43 !s100 ogzmiH1Shh<T;DRYi9aL:2
+Z44 I_Hl9MFW>hXI<m0YWS9ozG2
+Z45 V^bVB2gh3PzU=eWQ>Y9i=H1
+R4
+R5
+R6
+R7
+L0 49
+R8
+r1
+31
+R9
+R10
+Z46 n@d@r_@register
+!s85 0
+!s101 -O0
+vE_Register
+Z47 !s100 3Y3oif`AX8iCQ1AOoH0N`1
+Z48 Ia9DDmUPkBPR:BUih;6BdL0
+Z49 Voa3K[3dV?NSRRV3c7G3i51
+R4
+R15
+R16
+R17
+L0 94
+R8
+r1
+31
+R9
+R10
+Z50 n@e_@register
+!s85 0
+!s101 -O0
+vINPR
+Z51 !s100 4_n^842e3SBl]ZdH[29JW2
+Z52 ITR[FR<J;lg1L^c^B0K2;E3
+Z53 VhdSK8;NdY`Ul3[Z_aKiAF1
+R4
+R5
+R6
+R7
+Z54 L0 123
+R8
+r1
+31
+R9
+R10
+Z55 n@i@n@p@r
+!s85 0
+!s101 -O0
+vIR_Register
+Z56 !s100 KCE<@nGDmVeHLX1_kEP5<3
+Z57 II^`43`noMjU8gFJFN:E=R2
+Z58 VfR2hGmG@Rd>JhCj;_8aF_0
+R4
+R5
+R6
+R7
+L0 82
+R8
+r1
+31
+R9
+R10
+Z59 n@i@r_@register
+!s85 0
+!s101 -O0
+vmemory
+Z60 !s100 [e_`eX>>=jO=aOJQd^T4k1
+Z61 I98lX2N72@QnUi9b7[RKL]3
+Z62 Vb<7DcX5AAOfl8LnSX?RM52
+R4
+Z63 w1733419013
+Z64 8C:/Users/User/Desktop/New folder (4)/Archi/Memory.v
+Z65 FC:/Users/User/Desktop/New folder (4)/Archi/Memory.v
+L0 1
+R8
+r1
+31
+R9
+R10
+!s85 0
+!s101 -O0
+vOUTR
+Z66 !s100 cUQSdhBR4TAlcHW@NzoV[3
+Z67 IX4b^@Tkk1=`E;]AdG=FJ22
+Z68 V;c[o;]We18C^33C2cM]C:2
+R4
+R5
+R6
+R7
+Z69 L0 110
+R8
+r1
+31
+R9
+R10
+Z70 n@o@u@t@r
+!s85 0
+!s101 -O0
+vPC_Register
+Z71 !s100 WK@=><8@ZOfV2DeAZDI`m0
+Z72 IAZP=]GRHiC4ZObzlT_SE43
+Z73 Vd5BS`l3lP2HWBUzei6hP30
+R4
+R5
+R6
+R7
+L0 29
+R8
+r1
+31
+R9
+R10
+Z74 n@p@c_@register
+!s85 0
+!s101 -O0
+vSC
+Z75 !s100 5A9C_hDh3PUf6d3BEn_]=1
+Z76 I@:`o4[SoU<`Xbiz@enTdb0
+Z77 VgY:I3?80EU_Lg2?@d@V2V0
+R39
+Z78 w1733422534
+R41
+R42
+L0 1
+R8
+r1
+31
+R9
+R10
+n@s@c
+!s85 0
+!s101 -O0
+vTR_Register
+Z79 !s100 S5z7V9BFY]2R8DZ:f_BlB3
+Z80 IFTQN0M?U:^OPY4K[_U[Dj0
+Z81 VUQWo]gQHn9?J5YHeVC1cQ3
+R4
+R5
+R6
+R7
+L0 94
+R8
+r1
+31
+R9
+R10
+Z82 n@t@r_@register
+!s85 0
+!s101 -O0

@@ -1,0 +1,450 @@
+module CU
+  #(parameter ADDR_WIDTH = 12,
+    parameter DATA_WIDTH = 16)
+(
+   input CLK,
+   input [2:0]Opcode,
+   input I_bit,
+   input IEN,
+   input FGO,
+   input FGI,
+   output reg set_IEN,
+   output reg set_FGI,
+   output reg set_FGO,
+   output reg clrIEN,
+   output reg clrFGI,
+   output reg clrFGO,
+   output reg ldINPR,
+   output reg ldOUTR,
+   output reg ldAR,
+   output reg ldPC,
+   output reg ldDR,
+   output reg ldAC,
+   output reg ldIR,
+   output reg ldTR, 
+   output reg clrAR,
+   output reg clrPC,
+   output reg clrDR,
+   output reg clrAC,
+   output reg clrTR, 
+   output reg inrAR,
+   output reg inrPC,
+   output reg inrDR,
+   output reg inrAC,
+   output reg inrTR,
+   output reg memwrite,
+   output reg memread,                    
+   output reg [3:0] aluop,
+   output reg [2:0] s,
+   output reg INC,
+   output reg CLR,
+   input [DATA_WIDTH-1:0]T,
+   input  [7:0]D,
+   input [3:0]B,
+   input DR_ZERO,
+   input A_ZERO,
+   input A_Flag,
+   input E_ZERO
+   ); 
+   
+  
+    wire r;
+    assign r = (T[3] ^ D[7] ^ !I_bit);
+    wire p;
+    assign p = (I_bit^ T[3] ^ D[7]);
+
+  always @(*) begin
+	  ldAR = 0;
+	  ldPC = 0;
+	  ldDR = 0;
+	  ldAC = 0;
+	  ldIR = 0;
+	  ldTR = 0;
+	  ldINPR = 0;
+    ldOUTR = 0;
+    clrAR = 0;
+	  clrPC = 0;
+	  clrDR = 0;
+	  clrAC = 0;
+	  clrTR = 0;
+	  inrAR = 0;
+	  inrPC = 0;
+	  inrDR = 0;
+	  inrAC = 0;
+	  inrTR = 0;
+	  set_IEN = 0;
+      set_FGI = 0;
+      set_FGO = 0;
+      clrIEN = 0;
+      clrFGI = 0;
+      clrFGO = 0;
+	  memwrite = 0;
+	  memread = 0;                  
+	  aluop = 4'b0000;
+	  s = 3'b000;
+ 
+	  if(T[0]) begin// Fetch phase
+			      CLR<=0;
+		        s <= 3'b010;
+            ldAR <= 1; 
+            INC = 1;
+      end
+      else if (T[1]) begin
+            memread <= 1;
+            s <= 3'b111;
+			      ldIR <= 1;
+            INC <= 1;
+			      inrPC<=1;
+      end
+      else if (T[2]) begin
+            s = 3'b101;
+			      ldAR = 1;
+            INC <= 1;     
+      end
+      else if (T[3]) begin
+      // Determine if indirect or direct
+          if (I_bit) begin
+            memread <= 1;
+				    s <= 3'b111;
+            ldAR <= 1;
+            INC <= 1;
+          end else begin
+            INC<=1;// Direct addressing, do nothing
+          end
+      end
+      else if (T[4] & D[0]) begin
+            s = 3'b111;
+            ldDR = 1;
+            memread <= 1;
+            INC <= 1;
+      end
+      else if (T[5] & D[0]) begin
+            ldAC <= 1;
+            aluop <= 4'b0000;
+            CLR <= 1;
+      end
+      else if (T[4] & D[1]) begin            
+            s = 3'b111;
+            ldDR = 1; 
+            memread <= 1;
+            INC <= 1;
+      end
+      else if (T[5] & D[1]) begin
+            ldAC <= 1;
+            aluop = 4'b0001;
+            CLR <= 1;
+      end
+      else if (T[4] & D[2]) begin     
+            s = 3'b111;
+		        memread <= 1;
+            ldDR <= 1;
+            INC <= 1;
+      end
+      else if (T[5] & D[2]) begin
+            aluop=4'b1101;
+		        ldAC <= 1;
+            CLR <= 1;
+      end
+      else if (T[4] & D[3]) begin
+            s = 3'b100;
+            memwrite <= 1;
+            CLR <= 1;
+      end
+      else if (T[4] & D[4]) begin
+            // BUN Instruction Execution
+            s = 3'b001;
+            ldPC = 1;
+            CLR <= 1;
+      end
+      else if (T[4] & D[5]) begin
+            s=3'b010;    // Store the PC in memory at address AR
+            memwrite <= 1;         // Write PC to memory
+            inrAR <= 1;     
+			      INC<=1;
+      end
+      else if (T[5] & D[5]) begin
+            // BSA Instruction Execution - Step 2: PC <- AR, SC <- 0
+            ldPC <= 1;             // Load AR into PC (PC <- AR)
+            s = 3'b001;
+            CLR <= 1;               // Clear sequence counter SC
+      end
+      else if (T[4] & D[6]) begin
+			      s = 3'b111;
+            memread <= 1;  
+            ldDR <= 1;  
+      end
+      else if (T[5] & D[6]) begin
+            inrDR <= 1;  
+      end
+      else if (T[6] & D[6]) begin
+            s = 3'b011;
+            memwrite <= 1;  
+		      if (DR_ZERO)  
+            inrPC <= 1;  
+            CLR <= 1;  
+      end
+      else if (r ^ B == 4'b1011) begin
+            clrAC<=1;
+			      CLR	<=1;		
+      end
+      else if (r ^ B== 4'b1010) begin
+		        aluop <= 4'b0111;
+		        CLR <=1;
+      end
+	  else if (r ^ B== 4'b1001) begin
+		        aluop = 4'b0011;
+		        ldAC <= 1;
+		        CLR<=1;
+		  end
+	  else if (r ^ B== 4'b1000) begin
+            aluop <= 4'b1000;
+            CLR<=1;
+			end
+	  else if (r ^ B== 4'b0111) begin
+            aluop <= 0100; // CIR function
+    		      ldAC <= 1; 
+			      CLR<=1;
+      end
+	  else if (r ^ B== 4'b0110) begin
+            aluop <= 0101; // CIL function
+			      ldAC <= 1; 
+			      CLR<=1;
+      end
+	  else if (r ^ B== 4'b0101) begin
+             inrAC = 1; //INC AC
+			       CLR<=1;			
+      end
+	  else if (r ^ B== 4'b0100) begin
+		       if (A_Flag)begin
+             inrPC <= 1;
+             CLR<=1;
+           end else 
+             CLR<=1;			
+      end
+		  else if (r ^ B== 4'b0011) begin
+		       if (!A_Flag)begin
+             inrPC <= 1;
+			       CLR<=1;
+			     end else 
+			       CLR<=1;
+      end
+	  else if (r ^ B== 4'b0010) begin
+           if (A_ZERO)begin
+			       inrPC<=1;
+			       CLR<=1;
+			     end else 
+			       CLR<=1;
+      end
+	  else if (r ^ B== 4'b0001) begin
+           if (E_ZERO)begin
+			       inrPC<=1;
+			       CLR<=1;
+			     end else 
+			       CLR<=1;
+      end
+	  else if (r ^ B== 4'b0000) begin
+            clrAC<=1;
+			      clrAR<=1;
+			      clrDR<=1;
+			      clrTR<=1;
+			      CLR<=1;
+      end
+      else if (p ^ B == 4'b1011) begin
+            aluop <= 4'he;
+            ldAC <= 1;
+            clrFGI <= 1;
+			CLR	<=1;		
+      end
+      else if (p ^ B== 4'b1010) begin
+		        s = 3'b100;
+		        ldOUTR <= 1;
+		        clrFGO <= 1;
+		        CLR <=1;
+      end
+	  else if (p ^ B== 4'b1001) begin
+		        if (FGI)begin
+			       inrPC<=1;
+			       CLR<=1;
+			     end else 
+			       CLR<=1;
+		  end
+	  else if (p ^ B== 4'b1000) begin
+            if (FGO)begin
+			       inrPC<=1;
+			       CLR<=1;
+			     end else 
+			       CLR<=1;
+			end
+	  else if (p ^ B== 4'b0111) begin
+	              set_IEN <= 1;
+			      CLR<=1;
+      end
+	  else if (p ^ B== 4'b0110) begin 
+			      clrIEN <= 1;
+			      CLR<=1;
+      end
+			
+    end
+
+    
+endmodule
+
+//-------------------------------------------------------------------
+module I_module (
+    input  IR,   // Instruction Register (16-bit)
+    output reg I_bit   // Output for Indirect Addressing bit (Bit 15)
+);
+    always @(*) begin
+        I_bit = IR;  // Extract bit 15 of the IR
+    end
+endmodule
+
+//--------------------------------------------------------------------
+
+module IR_Decoder
+  #(parameter m = 8)
+  (input [m-6:0] Data_IN,
+   output reg [m-1:0] D);
+
+   always @(*) begin
+    D = 8'b00000000; // Reset all bits
+    case (Data_IN)
+      3'b000 : D = 8'b00000001; // Set D[0]
+      3'b001 : D = 8'b00000010; // Set D[1]
+      3'b010 : D = 8'b00000100; // Set D[2]
+      3'b011 : D = 8'b00001000; // Set D[3]
+      3'b100 : D = 8'b00010000; // Set D[4]
+      3'b101 : D = 8'b00100000; // Set D[5]
+      3'b110 : D = 8'b01000000; // Set D[6]
+      3'b111 : D = 8'b10000000; // Set D[7]
+    endcase
+  end
+
+endmodule
+//-------------------------------------------------------
+module SequenceCounter
+    #(parameter m = 4)
+    (input CLR, CLK,INC,
+    output reg [m-1:0] SC_OUT);
+	initial begin 
+	SC_OUT=4'b0000;
+	end
+	always @(posedge CLK)
+		begin
+			if(CLR)
+			SC_OUT = 4'b0000;
+			else if(INC)
+			SC_OUT = SC_OUT + 1;
+		end
+		
+endmodule
+//-------------------------------------------------------
+module TDECODER
+  #(parameter m = 16)
+  (input [m-13:0] Data_IN,
+   output reg [m-1:0] T);
+   
+   initial begin
+   T=16'b0000000000000000;
+ end
+ 
+   always @(*) begin
+    T = 16'b0000000000000000; // Reset all bits
+    case (Data_IN)
+      4'b0000 : T = 16'b0000000000000001; // Set T[0]
+      4'b0001 : T = 16'b0000000000000010; // Set T[1]
+      4'b0010 : T = 16'b0000000000000100; // Set T[2]
+      4'b0011 : T = 16'b0000000000001000; // Set T[3]
+      4'b0100 : T = 16'b0000000000010000; // Set T[4]
+      4'b0101 : T = 16'b0000000000100000; // Set T[5]
+      4'b0110 : T = 16'b0000000001000000; // Set T[6]
+      4'b0111 : T = 16'b0000000010000000; // Set T[7]
+      4'b1000 : T = 16'b0000000100000000; // Set T[8]
+      4'b1001 : T = 16'b0000001000000000; // Set T[9]
+      4'b1010 : T = 16'b0000010000000000; // Set T[10]
+      4'b1011 : T = 16'b0000100000000000; // Set T[11]
+      4'b1100 : T = 16'b0001000000000000; // Set T[12]
+      4'b1101 : T = 16'b0010000000000000; // Set T[13]
+      4'b1110 : T = 16'b0100000000000000; // Set T[14]
+      4'b1111 : T = 16'b1000000000000000; // Set T[15]
+    endcase
+end
+endmodule
+
+//------------------------------------------------------------------
+module IR0_11ENCODER #(parameter m=12)
+(
+input [11:0]IR0_11,
+output reg [3:0]B
+);
+	initial begin 
+	B =12'b000000000000;
+	end
+
+always @(*)begin
+ case(IR0_11)
+ 12'b000000000001 : B=4'b0000;
+ 12'b000000000010 : B=4'b0001;
+ 12'b000000000100 : B=4'b0010;
+ 12'b000000001000 : B=4'b0011;
+ 12'b000000010000 : B=4'b0100;
+ 12'b000000100000 : B=4'b0101;
+ 12'b000001000000 : B=4'b0110;
+ 12'b000010000000 : B=4'b0111;
+ 12'b000100000000 : B=4'b1000;
+ 12'b001000000000 : B=4'b1001;
+ 12'b010000000000 : B=4'b1010;
+ 12'b100000000000 : B=4'b1011;
+ endcase
+ end
+endmodule
+//--------------------------------------------------------------------
+module IEN_FF(
+    input CLK,          // Clock signal
+    input SET,      // Signal to set IEN
+    input CLR,    // Signal to clear IEN
+    output reg IEN      // Interrupt Enable flip-flop
+);
+
+always @(posedge CLK) begin
+    if (SET)
+        IEN <= 1'b1;    // Set IEN
+    else if (CLR)
+        IEN <= 1'b0;    // Clear IEN
+end
+
+endmodule
+
+//--------------------------------------------------------------------
+module FGO_FF(
+    input CLK,          // Clock signal
+    input SET,      // Signal to set FGO
+    input CLR,    // Signal to clear FGO
+    output reg FGO      // Output flag flip-flop
+);
+
+always @(posedge CLK) begin
+    if (SET)
+        FGO <= 1'b1;    // Set FGO
+    else if (CLR)
+        FGO <= 1'b0;    // Clear FGO
+end
+
+endmodule
+//--------------------------------------------------------------------
+module FGI_FF(
+    input CLK,          // Clock signal
+    input SET,      // Signal to set FGI
+    input CLR,    // Signal to clear FGI
+    output reg FGI      // Input flag flip-flop
+);
+
+always @(posedge CLK) begin
+    if (SET)
+        FGI <= 1'b1;    // Set FGI
+    else if (CLR)
+        FGI <= 1'b0;    // Clear FGI
+end
+
+endmodule
+//--------------------------------------------------------------------

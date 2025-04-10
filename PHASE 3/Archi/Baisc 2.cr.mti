@@ -1,0 +1,52 @@
+C:/Users/ahmad/OneDrive/Desktop/Archi/DataPath.v {1 {vlog -work work -nocovercells C:/Users/ahmad/OneDrive/Desktop/Archi/DataPath.v
+Model Technology ModelSim ALTERA vlog 6.6c Compiler 2010.08 Aug 24 2010
+-- Compiling module datapath
+-- Compiling module commonbus
+
+Top level modules:
+	datapath
+
+} {} {}} C:/Users/ahmad/OneDrive/Desktop/Archi/DataPath_TB.v {1 {vlog -work work -nocovercells C:/Users/ahmad/OneDrive/Desktop/Archi/DataPath_TB.v
+Model Technology ModelSim ALTERA vlog 6.6c Compiler 2010.08 Aug 24 2010
+-- Compiling module datApath_tb
+
+Top level modules:
+	datApath_tb
+
+} {} {}} C:/Users/ahmad/OneDrive/Desktop/Archi/Memory.v {1 {vlog -work work -nocovercells C:/Users/ahmad/OneDrive/Desktop/Archi/Memory.v
+Model Technology ModelSim ALTERA vlog 6.6c Compiler 2010.08 Aug 24 2010
+-- Compiling module memory
+
+Top level modules:
+	memory
+
+} {} {}} C:/Users/ahmad/OneDrive/Desktop/Archi/ALU.v {1 {vlog -work work -nocovercells C:/Users/ahmad/OneDrive/Desktop/Archi/ALU.v
+Model Technology ModelSim ALTERA vlog 6.6c Compiler 2010.08 Aug 24 2010
+-- Compiling module ALU
+-- Compiling module E_Register
+
+Top level modules:
+	ALU
+
+} {} {}} C:/Users/ahmad/OneDrive/Desktop/Archi/REG.v {1 {vlog -work work -nocovercells C:/Users/ahmad/OneDrive/Desktop/Archi/REG.v
+Model Technology ModelSim ALTERA vlog 6.6c Compiler 2010.08 Aug 24 2010
+-- Compiling module AR_Register
+-- Compiling module PC_Register
+-- Compiling module DR_Register
+-- Compiling module AC_Register
+-- Compiling module IR_Register
+-- Compiling module TR_Register
+-- Compiling module OUTR
+-- Compiling module INPR
+
+Top level modules:
+	AR_Register
+	PC_Register
+	DR_Register
+	AC_Register
+	IR_Register
+	TR_Register
+	OUTR
+	INPR
+
+} {} {}}

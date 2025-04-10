@@ -1,0 +1,149 @@
+module AR_Register
+#(parameter m = 16,  // Input width (16 bits)
+  parameter A = 12)  // Output width (12 bits)
+(
+    input [m-1:0] Data_in,  // Input data to load into the register (16 bits)
+    input LD,                // Load control signal
+    input INR,               // Increment control signal
+    input CLR,               // Clear control signal
+    input CLK,               // Clock signal
+    output reg [A-1:0] Data_out  // Output data from the register (12 bits)
+);
+initial begin 
+Data_out=16'b0000000000000000;
+end
+always @(posedge CLK) begin
+    // If the clear signal (CLR) is high, reset the register to zero
+    if (CLR)
+        Data_out = 12'b0;  // Clear the 12-bit output register to 0
+    // If the load signal (LD) is high, load the lower 12 bits of the input data into the register
+    else if (LD)
+        Data_out <= Data_in[A-1:0];  // Only take the lower 12 bits of Data_in
+    // If the increment signal (INR) is high, increment the register
+    else if (INR)
+        Data_out <= Data_out + 1;  // Increment the value in the register
+end
+
+endmodule
+
+/*repeat the same proccess for the rest o the registers,depending on the
+requirements of each register*/
+module PC_Register 
+    #(parameter m = 16) 
+    (input [m-1:0] Data_in,
+     input LD, INR, CLR, CLK,
+     output reg [m-1:0] Data_out);  
+     
+    initial begin 
+    Data_out = 16'h012c;
+  end 
+        
+    always @(posedge CLK) 
+    begin
+      begin
+        if (Data_out == 16'b0)
+        Data_out = 16'b0000000100101100;
+      end  
+        if (CLR)
+            Data_out <= {m{1'b0}}; 
+        else if (LD)
+            Data_out <= Data_in;          
+        else if (INR)
+            Data_out <= Data_out + 1;      
+    end
+endmodule
+
+module DR_Register 
+    #(parameter m = 16) 
+    (input [m-1:0] Data_in,
+     input LD, INR, CLR, CLK,
+     output reg [m-1:0] Data_out);       
+initial begin 
+Data_out=16'b0000000000000000;
+end
+    always @(posedge CLK) 
+    begin
+        if (CLR)
+            Data_out <= {m{1'b0}}; 
+        else if (LD)
+            Data_out <= Data_in;          
+        else if (INR)
+            Data_out <= Data_out + 1;      
+    end
+endmodule
+module AC_Register 
+
+    #(parameter m = 16) 
+    (input [m-1:0] Data_in,
+     input LD, INR, CLR, CLK,
+     output reg [m-1:0] Data_out);       
+    initial begin 
+	Data_out=16'b0000000000000000;
+	end
+    always @(posedge CLK) 
+    begin
+        if (CLR)
+            Data_out = {m{1'b0}}; 
+        else if (LD)
+            Data_out = Data_in;          
+        else if (INR)
+            Data_out = Data_out + 1;      
+    end
+endmodule
+module IR_Register 
+    #(parameter m = 16) 
+    (input [m-1:0] Data_in,
+     input LD, CLK,
+     output reg [m-1:0] Data_out);       
+initial begin 
+Data_out=16'b0000000000000000;
+end
+    always @(posedge CLK) 
+    begin
+        if (LD)
+            Data_out = Data_in;                
+    end
+endmodule
+module TR_Register 
+    #(parameter m = 16) 
+    (input [m-1:0] Data_in,
+     input LD, INR, CLR, CLK,
+     output reg [m-1:0] Data_out);       
+initial begin 
+Data_out=16'b0000000000000000;
+end
+    always @(posedge CLK) 
+    begin
+        if (CLR)
+            Data_out = {m{1'b0}}; 
+        else if (LD)
+            Data_out = Data_in;
+        else if (INR)
+            Data_out = Data_out + 1;      
+    end
+endmodule
+module OUTR
+    #(parameter u = 8)
+    (input [u-1:0] Data_in,
+     input CLK,
+     output reg [u-1:0] Data_out);
+     
+    always @(posedge CLK) 
+    begin
+        
+            Data_out = Data_in;       
+    
+endmodule
+
+module INPR
+    #(parameter u = 8)
+    (input [u-1:0] Data_in,
+     input CLK,
+     output reg [u-1:0] Data_out);
+     
+    always @(posedge CLK) 
+    begin
+
+        Data_out = Data_in;       
+    
+endmodule
